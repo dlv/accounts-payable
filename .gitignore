@@ -1,0 +1,55 @@
+# Gradle
+.gradle/
+build/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Docker
+**/ap-db-data/
+**/deploy/.env
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+
+# Spring Boot
+**/target/
+**/out/
+
+# Node modules (if applicable)
+node_modules/
+
+# Miscellaneous
+*.bak
+*.old
+*.orig
+*.rej
+*.sublime-workspace
+*.sublime-project
+
+# Environment variables
+.env
+.env.*
+
+# Database
+**/deploy/database/

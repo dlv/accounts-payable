@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: ap-backend-api
+  threads:
+    virtual:
+      enabled=true:

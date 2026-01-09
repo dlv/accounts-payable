@@ -1,0 +1,42 @@
+services:
+  # Banco de Dados - MySQL 9.x
+  db:
+    image: mysql:9.0
+    container_name: ap-database
+    restart: always
+    environment:
+      MYSQL_DATABASE: accounts_payable_db
+      MYSQL_USER: ${DB_USER:-admin}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-secret}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootsecret}
+    ports:
+      - "3306:3306"
+    volumes:
+      - ap-db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ap-network
+
+  # Backend - Ajuste na URL de conexão
+  #backend:
+    # ... (mesma configuração anterior)
+  #  environment:
+  #    - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/accounts_payable_db?allowPublicKeyRetrieval=true&useSSL=false
+  #    - SPRING_DATASOURCE_USERNAME=${DB_USER:-admin}
+  #    - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD:-secret}
+  #    - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.MySQLDialect
+    # ...
+
+# Definição das Redes Usadas
+networks:
+  ap-network:
+    driver: bridge
+
+# Definição dos Volumes Usados
+volumes:
+  ap-db-data:
+    driver: local
