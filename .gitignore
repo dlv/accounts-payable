@@ -53,3 +53,6 @@ node_modules/
 
 # Database
 **/deploy/database/
+
+# Gemini
+.gemini/

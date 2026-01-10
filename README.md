@@ -1,12 +1,12 @@
 # Documentação do Projeto: accounts-payable
 
 ## Visão Geral do Projeto
-O `accounts-payable` é um sistema moderno de gerenciamento de contas a pagar, com arquitetura desacoplada.
+O `accounts-payable` é um sistema moderno e **reativo** de gerenciamento de contas a pagar, com arquitetura desacoplada, construído com **Spring Boot WebFlux e Spring Data R2DBC**.
 
 ## Componentes da Stack
-*   **ap-backend-api**: API RESTful desenvolvida em Java 21 (Spring Boot), utilizando Gradle para o gerenciamento de dependências e build.
+*   **ap-backend-api**: API RESTful **reativa** desenvolvida em Java 21 (Spring Boot WebFlux), utilizando Gradle para o gerenciamento de dependências e build. Implementa **Spring Data R2DBC** para persistência reativa e segue a **Arquitetura Hexagonal**.
 *   **ap-frontend-web**: Interface do usuário desenvolvida em Angular (SPA).
-*   **Banco de Dados**: MySQL.
+*   **Banco de Dados**: MySQL 8, com migrações gerenciadas por Flyway (JDBC) e acesso de dados reativo via R2DBC.
 
 ## Preparação do Ambiente
 
@@ -42,29 +42,14 @@ docker compose up --build
 
 ## Ajustes Principais no Backend
 
-O arquivo `build.gradle.kts` agora define a compatibilidade com a versão 21 do Java:
-```kotlin
-// Exemplo de trecho do build.gradle.kts
-plugins {
-    // ... plugins do Spring Boot e Kotlin
-}
+O `ap-backend-api` foi atualizado para uma arquitetura **totalmente reativa** utilizando **Spring Boot WebFlux** e **Spring Data R2DBC**. As principais mudanças incluem:
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
-}
-// ...
-```
-
-E o `Dockerfile` dentro de `ap-backend-api` agora utiliza uma imagem base apropriada para Java 21:
-```dockerfile
-# Exemplo de Dockerfile (Multi-stage build)
-FROM gradle:8.5-jdk21 AS build
-# ... (etapa de build)
-
-FROM bellsoft/liberica-openjdk-alpine:21-crs-slim AS runtime
-# ... (etapa de execução)
-```
+*   **Substituição de tecnologias**: `spring-boot-starter-webmvc` e `spring-boot-starter-data-jpa` foram substituídos por `spring-boot-starter-webflux` e `spring-boot-starter-data-r2dbc`, respectivamente.
+*   **Acesso a Dados Reativo**: A persistência de dados agora é gerenciada pelo R2DBC, garantindo um fluxo não bloqueante com o MySQL. O Flyway ainda é utilizado para migrações de esquema, acessando o banco via JDBC.
+*   **Arquitetura Hexagonal**: A estrutura de pacotes reflete os princípios da Arquitetura Hexagonal (Ports & Adapters), separando as responsabilidades em:
+    *   `domain`: Contém o núcleo de negócio (entidades, casos de uso/portas).
+    *   `application`: Orquestra a lógica da aplicação (implementações de caso de uso).
+    *   `infrastructure`: Responsável pela exposição via REST (controladores) e configurações de framework.
 
 ## Estrutura de Pastas
 
@@ -72,6 +57,14 @@ FROM bellsoft/liberica-openjdk-alpine:21-crs-slim AS runtime
 accounts-payable/
 ├── ap-backend-api/              # Backend (Java 21 / Spring Boot REST / Gradle)
 │   ├── src/
+│   │   └── main/
+│   │       └── java/
+│   │           └── com/
+│   │               └── pradolabs/
+│   │                   └── ap/
+│   │                       ├── domain/      # Núcleo de negócio (modelos, portas/interfaces de caso de uso, repositórios)
+│   │                       ├── application/ # Lógica da aplicação (implementações de caso de uso)
+│   │                       └── infrastructure/ # Camada de infraestrutura (controladores REST, configurações)
 │   ├── Dockerfile               # Build usa JRE 21
 │   ├── build.gradle.kts         # Configuração Gradle (Kotlin DSL)
 │   └── settings.gradle.kts      # Configurações de módulo do Gradle
@@ -98,4 +91,39 @@ accounts-payable/
     └── database/               # Pasta opcional para scripts SQL do Flyway
         ├── V1__create_tables.sql
         └── V2__insert_data.sql
+```
+
+## Exemplo de Chamada de Endpoint
+
+### `POST /api/v1/accounts-payable`
+
+Cria um novo registro de contas a pagar.
+
+**Requisição (Exemplo):**
+```bash
+curl -X POST \
+  http://localhost:8080/api/v1/accounts-payable \
+  -H 'Content-Type: application/json' \
+  -d 
+  {
+    "description": "Payment for office supplies",
+    "amount": 150.75,
+    "dueDate": "2026-03-15",
+    "bills": "INV-2026-001",
+    "createdAt": "2026-01-10T10:00:00",
+    "updatedAt": "2026-01-10T10:00:00"
+  }
+```
+
+**Resposta (Exemplo):
+```json
+{
+  "id": 1,
+  "description": "Payment for office supplies",
+  "amount": 150.75,
+  "dueDate": "2026-03-15",
+  "bills": "INV-2026-001",
+  "createdAt": "2026-01-10T10:00:00",
+  "updatedAt": "2026-01-10T10:00:00"
+}
 ```
