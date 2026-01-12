@@ -3,8 +3,8 @@ package com.pradolabs.ap.infrastructure.web;
 import com.pradolabs.ap.domain.model.request.AccountPayableResquest;
 import com.pradolabs.ap.domain.model.response.AccountPayableResponse;
 import com.pradolabs.ap.domain.port.in.CreateAccountPayableUseCase;
-import com.pradolabs.ap.infrastructure.web.dto.ApiResponse;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,10 +25,12 @@ public class AccountPayableController {
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  public Mono<ApiResponse<AccountPayableResponse>> create(
+  public Mono<ResponseEntity<AccountPayableResponse>> create(
       @RequestBody AccountPayableResquest accountPayable) {
+
     return createAccountPayableUseCase
-        .createAccountPayable(accountPayable)
-        .map(ApiResponse::success);
+            .createAccountPayable(accountPayable)
+            .map(ResponseEntity::ok)
+            .defaultIfEmpty(ResponseEntity.notFound().build());
   }
 }
