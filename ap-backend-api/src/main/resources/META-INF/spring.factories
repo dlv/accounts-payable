@@ -1,0 +1,2 @@
+org.springframework.context.ApplicationContextInitializer=\
+com.pradolabs.ap.infrastructure.config.DotEnvConfig

@@ -24,10 +24,12 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
 	implementation("org.springframework.boot:spring-boot-starter-flyway")
 	implementation("org.springframework.boot:spring-boot-starter-security")
+	implementation("org.springframework.boot:spring-boot-starter-jdbc")
 
 	implementation("org.flywaydb:flyway-mysql")
+	implementation("com.mysql:mysql-connector-j")
+	implementation("io.github.cdimascio:dotenv-java:3.0.0")
 	runtimeOnly("io.asyncer:r2dbc-mysql")
-	runtimeOnly("com.mysql:mysql-connector-j")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("io.projectreactor:reactor-test")
