@@ -2,6 +2,10 @@ spring:
   application:
     name: ap-backend-api
 
+  threads:
+    virtual:
+      enabled=true
+
   r2dbc:
     url: r2dbc:mysql://localhost:3306/accounts_payable_db
     username: ${DB_USER}
@@ -24,3 +28,16 @@ management:
     web:
       exposure:
         include: "*"
+
+logging:
+  level:
+    root: INFO
+    # Define nveis especficos para pacotes
+    com.pradolabs.ap: DEBUG
+  file:
+    # Salva os logs em um arquivo (gerado na raiz do projeto)
+    name: logs/ap-api.log
+  structured:
+    # NOVIDADE 2026 (Spring Boot 3.4+): Ativa logs estruturados em JSON
+    format:
+      console: ecs

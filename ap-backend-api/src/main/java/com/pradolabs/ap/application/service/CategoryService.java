@@ -4,12 +4,14 @@ import com.pradolabs.ap.domain.model.entity.Category;
 import com.pradolabs.ap.domain.model.request.CategoryRequest;
 import com.pradolabs.ap.domain.model.response.CategoryResponse;
 import com.pradolabs.ap.domain.port.in.CreateCategoryUseCase;
+import com.pradolabs.ap.domain.port.in.ListCategoryUseCase;
 import com.pradolabs.ap.domain.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
-public class CategoryService implements CreateCategoryUseCase {
+public class CategoryService implements CreateCategoryUseCase, ListCategoryUseCase {
 
   private final CategoryRepository categoryRepository;
 
@@ -21,7 +23,13 @@ public class CategoryService implements CreateCategoryUseCase {
   public Mono<CategoryResponse> createCategory(CategoryRequest request) {
     return validateRequest(request)
         .then(categoryRepository.save(Category.from(request)))
-        .map(this::toResponse);
+        .map(CategoryResponse::toResponse);
+  }
+
+  @Override
+  public Flux<CategoryResponse> listCategories() {
+    return categoryRepository.findAll()
+            .map(CategoryResponse::toResponse);
   }
 
   private Mono<Void> validateRequest(CategoryRequest request) {
@@ -43,16 +51,5 @@ public class CategoryService implements CreateCategoryUseCase {
       }
       return Mono.empty();
     });
-  }
-
-  private CategoryResponse toResponse(Category category) {
-    return new CategoryResponse(
-        category.id(),
-        category.name(),
-        category.alias(),
-        category.percentage(),
-        category.suggestedValue(),
-        category.description(),
-        category.createdAt());
   }
 }
